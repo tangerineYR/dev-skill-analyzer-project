@@ -100,7 +100,7 @@ def analyze_skill_frequency(df, top_n=20):
     return all_skill_data
 
 # 3. 시각화 1: 직무별 공고 수(시장 크기) 비교 (막대 그래프)
-def plot_job_counts(df, filename='job_role_counts.png'):
+def plot_job_counts(df, filename='graph_job_role_counts.png'):
     print("직무별 공고 수 시각화 중...")
     
     job_counts = df['job_role'].value_counts().sort_values(ascending=True) # 오름차순 정렬
@@ -138,7 +138,7 @@ def plot_job_counts(df, filename='job_role_counts.png'):
     print(f"'{filename}' (Matplotlib) 그래프 저장 완료.")
 
 # 4. 시각화 2: 직무별 요구 기술 topN (막대 그래프)
-def plot_top_skills(skill_data, filename_prefix='top_skills'):
+def plot_top_skills(skill_data, filename_prefix='graph_top_skills'):
     for role, data in skill_data.items():
         if data.empty:
             print(f"[{role}] 직무에 대한 데이터가 없어 막대 그래프를 건너뜁니다.")
@@ -178,7 +178,7 @@ def plot_top_skills(skill_data, filename_prefix='top_skills'):
  
 
 # 5. 시각화 3: 직무 간 기술 스택 비교 히트맵
-def plot_heatmap_comparison(df, skill_data, top_n=15, filename='skill_heatmap.png'):
+def plot_heatmap_comparison(df, skill_data, top_n=15, filename='graph_skill_heatmap.png'):
     all_top_skills = set()
     for data in skill_data.values():
         all_top_skills.update(data.head(top_n)['Skill'])
