@@ -181,7 +181,7 @@ def plot_top_skills(skill_data, filename_prefix='graph_top_skills'):
 def plot_heatmap_comparison(df, skill_data, top_n=15, filename='graph_skill_heatmap.png'):
     all_top_skills = set()
     for data in skill_data.values():
-        all_top_skills.update(data.head(top_n)['Skill'])
+        all_top_skills.update(data.tail(top_n)['Skill'])
     
     all_top_skills = sorted(list(all_top_skills))
     
@@ -249,5 +249,4 @@ def main():
         plt.show()
 
 if __name__ == "__main__":
-
     main()
