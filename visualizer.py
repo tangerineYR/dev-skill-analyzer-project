@@ -83,23 +83,7 @@ def load_and_clean_data(csv_file):
     print(df['job_role'].value_counts())
     return df
 
-# 2. 직무별 기술 스택 분석
-def analyze_skill_frequency(df, top_n=20):
-    job_roles = df['job_role'].unique()
-    all_skill_data = {}
-    for role in job_roles:
-        role_df = df[df['job_role'] == role]
-        total_jobs_for_role = len(role_df)
-        if total_jobs_for_role == 0: continue
-        all_skills_list = [skill for sublist in role_df['skills'] for skill in sublist]
-        skill_counts = Counter(all_skills_list)
-        top_skills_df = pd.DataFrame(skill_counts.most_common(top_n), columns=['Skill', 'Count'])
-        top_skills_df['Percentage'] = (top_skills_df['Count'] / total_jobs_for_role) * 100
-        # 막대그래프를 위해 역순 정렬 (맨 위가 1위가 되도록)
-        all_skill_data[role] = top_skills_df.sort_values(by='Percentage', ascending=True)
-    return all_skill_data
-
-# 3. 시각화 1: 직무별 공고 수(시장 크기) 비교 (막대 그래프)
+# 2. 시각화 1: 직무별 공고 수(시장 크기) 비교 (막대 그래프)
 def plot_job_counts(df, filename='graph_job_role_counts.png'):
     print("직무별 공고 수 시각화 중...")
     
@@ -136,6 +120,22 @@ def plot_job_counts(df, filename='graph_job_role_counts.png'):
     plt.tight_layout()
     plt.savefig(filename)
     print(f"'{filename}' (Matplotlib) 그래프 저장 완료.")
+
+# 3. 직무별 기술 스택 분석
+def analyze_skill_frequency(df, top_n=20):
+    job_roles = df['job_role'].unique()
+    all_skill_data = {}
+    for role in job_roles:
+        role_df = df[df['job_role'] == role]
+        total_jobs_for_role = len(role_df)
+        if total_jobs_for_role == 0: continue
+        all_skills_list = [skill for sublist in role_df['skills'] for skill in sublist]
+        skill_counts = Counter(all_skills_list)
+        top_skills_df = pd.DataFrame(skill_counts.most_common(top_n), columns=['Skill', 'Count'])
+        top_skills_df['Percentage'] = (top_skills_df['Count'] / total_jobs_for_role) * 100
+        # 막대그래프를 위해 역순 정렬 (맨 위가 1위가 되도록)
+        all_skill_data[role] = top_skills_df.sort_values(by='Percentage', ascending=True)
+    return all_skill_data
 
 # 4. 시각화 2: 직무별 요구 기술 topN (막대 그래프)
 def plot_top_skills(skill_data, filename_prefix='graph_top_skills'):
@@ -249,5 +249,4 @@ def main():
         plt.show()
 
 if __name__ == "__main__":
-
     main()
