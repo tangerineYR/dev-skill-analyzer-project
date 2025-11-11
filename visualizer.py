@@ -98,7 +98,7 @@ def plot_job_counts(df, filename='graph_job_role_counts.png'):
     bars = ax.barh(job_counts.index, job_counts.values, color=colors)
     
     # 레이블 및 제목 설정
-    ax.set_title("직무별 신입 채용 공고 수 비교 (시장 규모)", fontsize=16)
+    ax.set_title("직무별 신입 채용 공고 수 (시장 규모) 비교", fontsize=16)
     ax.set_xlabel("수집된 공고 수 (N)", fontsize=12)
     ax.set_ylabel("직무 (Job Roles)", fontsize=12)
     
@@ -249,4 +249,5 @@ def main():
         plt.show()
 
 if __name__ == "__main__":
+
     main()
