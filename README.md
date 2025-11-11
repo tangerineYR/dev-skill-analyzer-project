@@ -26,27 +26,27 @@
 
 #### 3. 파일 설명
 
-- scraper.py
+- **scraper.py**
 
   Selenium과 BeautifulSoup을 활용해 원티드에서 3개 직무의 상세 공고 페이지를 스크레이핑합니다.
 
   '기술 스택 태그'와 '본문 텍스트'를 모두 검색하는 방식을 사용하며, "R&D"와 같은 노이즈를 re(정규표현식)로 필터링합니다.
 
-- visualizer.py
+- **visualizer.py**
 
   wanted_jobs.csv를 pandas로 로드합니다. 'C / C++' -> 'C++'와 같이 표기를 통일하는 정규화를 수행한 뒤, Matplotlib과 Seaborn을 사용해 2가지 핵심 차트(막대그래프, 히트맵)를 생성 및 저장합니다.
 
-- wanted_jobs.csv
+- **wanted_jobs.csv**
 
   scraper.py를 통해 수집된 최종 원본 데이터(CSV)입니다.
 
-- *.png
+- ***.png**
 
   visualizer.py 실행 시 생성되는 최종 시각화 결과 이미지 파일입니다.
 
 #### 4. 프로젝트 파이프라인
 
-- 데이터 수집 (Scraping): scraper.py
+- 데이터 수집 (Scraping): **scraper.py**
 
   Python의 Selenium과 BeautifulSoup을 활용하여 각 직무별 채용 공고의 상세 페이지에 동적으로 접근합니다.
 
@@ -54,13 +54,13 @@
 
   "R&D"의 'R'과 같은 노이즈를 re(정규표현식)을 이용해 제거합니다.
 
-- 데이터 정제 (Cleaning): visualizer.py
+- 데이터 정제 (Cleaning): **visualizer.py**
 
   pandas를 이용해 수집된 wanted_jobs.csv 파일을 로드합니다.
 
   'C / C++' -> 'C++', 'github' -> 'Git' 등, 의미는 같지만 표기가 다른 기술 스택들을 'SKILL_NORMALIZATION_MAP'을 통해 표준화합니다.
 
-- 데이터 시각화 (Visualization): visualizer.py
+- 데이터 시각화 (Visualization): **visualizer.py**
 
   Matplotlib과 Seaborn을 활용하여 분석 결과를 시각화합니다.
 
@@ -85,7 +85,7 @@
 
 아래 명령어로 한 번에 설치할 수 있습니다: 
 
-pip install pandas selenium beautifulsoup4 webdriver-manager matplotlib seaborn
+```pip install pandas selenium beautifulsoup4 webdriver-manager matplotlib seaborn```
 
 #### 6. 시각화 결과 및 분석
 
