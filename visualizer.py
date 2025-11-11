@@ -99,12 +99,46 @@ def analyze_skill_frequency(df, top_n=20):
         all_skill_data[role] = top_skills_df.sort_values(by='Percentage', ascending=True)
     return all_skill_data
 
-# 3. 시각화 1: 순수 Matplotlib 막대 그래프
+# 3. 시각화 1: 직무별 공고 수(시장 크기) 비교 (막대 그래프)
+def plot_job_counts(df, filename='job_role_counts.png'):
+    print("직무별 공고 수 시각화 중...")
+    
+    job_counts = df['job_role'].value_counts().sort_values(ascending=True) # 오름차순 정렬
+    
+    fig, ax = plt.subplots(figsize=(10, 5))
+    
+    # Sequential Colormap
+    cmap = cm.get_cmap('viridis')
+    colors = cmap(np.linspace(0.4, 0.8, len(job_counts)))
+    
+    bars = ax.barh(job_counts.index, job_counts.values, color=colors)
+    
+    # 레이블 및 제목 설정
+    ax.set_title("직무별 신입 채용 공고 수 비교 (시장 규모)", fontsize=16)
+    ax.set_xlabel("수집된 공고 수 (N)", fontsize=12)
+    ax.set_ylabel("직무 (Job Roles)", fontsize=12)
+    
+    # 축 서식 설정 (콤마)
+    ax.xaxis.set_major_formatter(mticker.StrMethodFormatter('{x:,.0f}'))
+    
+    # 그리드 추가
+    ax.grid(color='gray', linewidth=0.2, axis='x', linestyle='--')
+    
+    # 막대 위에 숫자 표시
+    for bar in bars:
+        width = bar.get_width()
+        ax.text(width + 0.5, # 막대 오른쪽에
+                bar.get_y() + bar.get_height()/2, # 막대 중앙 높이에
+                f'{width}건', # 표시할 텍스트
+                va='center', 
+                ha='left')
+    
+    plt.tight_layout()
+    plt.savefig(filename)
+    print(f"'{filename}' (Matplotlib) 그래프 저장 완료.")
+
+# 4. 시각화 2: 직무별 요구 기술 topN (막대 그래프)
 def plot_top_skills(skill_data, filename_prefix='top_skills'):
-    """
-    Seaborn 대신, 교안 [Practice 1]의 순수 Matplotlib 방식을 사용해
-    가로 막대 그래프(barh)를 생성합니다.
-    """
     for role, data in skill_data.items():
         if data.empty:
             print(f"[{role}] 직무에 대한 데이터가 없어 막대 그래프를 건너뜁니다.")
@@ -123,19 +157,19 @@ def plot_top_skills(skill_data, filename_prefix='top_skills'):
         # 가로 막대그래프(barh) 생성
         ax.barh(skills, percentages, color=colors)
         
-        # 1. 레이블 및 제목 설정
+        # 레이블 및 제목 설정
         total_n = int(round((data['Count'] / (data['Percentage'] / 100)).mean()))
         ax.set_title(f"'{role}' 직무 요구 기술 Top {len(data)} (N={total_n})", fontsize=16)
         ax.set_xlabel("공고 포함 비율 (%)", fontsize=12)
         ax.set_ylabel("기술 스택", fontsize=12)
         
-        # 2. 축 서식 설정
+        # 축 서식 설정
         ax.xaxis.set_major_formatter(mticker.PercentFormatter(xmax=100.0))
         
-        # 3. 가독성을 위한 그리드 추가
+        # 가독성을 위한 그리드 추가
         ax.grid(color='gray', linewidth=0.2, axis='x', linestyle='--')
         
-        # 4. 레이아웃 최적화
+        # 레이아웃 최적화
         plt.tight_layout()
         
         filename = f"{filename_prefix}_{role.replace(' ', '_')}.png"
@@ -143,7 +177,7 @@ def plot_top_skills(skill_data, filename_prefix='top_skills'):
         print(f"'{filename}' (Matplotlib) 그래프 저장 완료.")
  
 
-# 4. 시각화 2: 직무 간 기술 스택 비교 히트맵
+# 5. 시각화 3: 직무 간 기술 스택 비교 히트맵
 def plot_heatmap_comparison(df, skill_data, top_n=15, filename='skill_heatmap.png'):
     all_top_skills = set()
     for data in skill_data.values():
@@ -198,12 +232,16 @@ def main():
     df = load_and_clean_data(INPUT_CSV_FILE)
     
     if df is not None:
+        # 직무별 공고 수(시장 크기) 비교 막대 그래프 생성
+        plot_job_counts(df)
+        
+        # 기술 스택 빈도 분석
         skill_data = analyze_skill_frequency(df, top_n=20)
         
-        # 1. 막대 그래프 생성
+        # 막대 그래프 생성
         plot_top_skills(skill_data)
         
-        # 2. 비교 히트맵 생성
+        # 비교 히트맵 생성
         plot_heatmap_comparison(df, skill_data)
 
         # 모든 플롯이 생성된 후, 마지막에 show() 호출
