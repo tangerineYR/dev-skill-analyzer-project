@@ -40,7 +40,7 @@
 
   scraper.py를 통해 수집된 최종 원본 데이터(CSV)입니다.
 
-- ***.png**
+- **graph_*.png**
 
   visualizer.py 실행 시 생성되는 최종 시각화 결과 이미지 파일입니다.
 
