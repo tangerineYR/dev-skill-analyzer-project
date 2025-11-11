@@ -108,7 +108,7 @@ def plot_job_counts(df, filename='graph_job_role_counts.png'):
     fig, ax = plt.subplots(figsize=(10, 5))
     
     # Sequential Colormap
-    cmap = cm.get_cmap('viridis')
+    cmap = cm.get_cmap('viridis_r')
     colors = cmap(np.linspace(0.4, 0.8, len(job_counts)))
     
     bars = ax.barh(job_counts.index, job_counts.values, color=colors)
@@ -150,7 +150,7 @@ def plot_top_skills(skill_data, filename_prefix='graph_top_skills'):
         percentages = data['Percentage']
         
         # Colormap 설정
-        cmap = cm.get_cmap('viridis')
+        cmap = cm.get_cmap('viridis_r')
         # 0.2 ~ 0.9 범위의 색상을 사용 (너무 연하거나 진한 색 제외)
         colors = cmap(np.linspace(0.2, 0.9, len(percentages)))
         
@@ -249,4 +249,5 @@ def main():
         plt.show()
 
 if __name__ == "__main__":
+
     main()
