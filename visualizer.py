@@ -9,7 +9,7 @@ import platform
 import matplotlib.font_manager as fm 
 import numpy as np
 
-# 데이터 정규화 맵
+# --- 데이터 정규화 맵 ---
 SKILL_NORMALIZATION_MAP = {
     # C/C++ 통일
     'c++': 'C++', 'c / c++': 'C++', 'c/c++': 'C++',
@@ -37,6 +37,15 @@ SKILL_NORMALIZATION_MAP = {
     # Data Science 계열
     'r': 'R', 'pandas': 'Pandas', 'tensorflow': 'TensorFlow', 'pytorch': 'PyTorch',
     'scikit-learn': 'Scikit-learn', 'keras': 'Keras', 'tableau': 'Tableau', 'power bi': 'Power BI',
+}
+
+# --- 기술 카테고리 분류 맵 ---
+SKILL_CATEGORY_MAP = {
+    'Language': ['Java', 'Python', 'JavaScript', 'TypeScript', 'Kotlin', 'C++', 'SQL', 'R', 'C#'],
+    'Framework/Lib': ['React', 'Spring', 'Spring Boot', 'Next.js', 'Django', 'Flask', 'FastAPI', 'Vue.js', 'PyTorch', 'TensorFlow', 'Scikit-learn', 'Pandas', 'Redux', 'Recoil', 'Svelte', 'Node.js'],
+    'Database': ['MySQL', 'PostgreSQL', 'Redis', 'MongoDB', 'MariaDB', 'Oracle'],
+    'Infra/Cloud': ['AWS', 'Docker', 'Kubernetes', 'Git', 'GCP', 'Azure', 'Linux'],
+    'Tool/Etc': ['Tableau', 'Power BI']
 }
 
 # 폰트 설정
@@ -100,7 +109,7 @@ def plot_job_counts(df, filename='graph_job_role_counts.png'):
     # 레이블 및 제목 설정
     ax.set_title("직무별 신입 채용 공고 수 (시장 규모) 비교", fontsize=16)
     ax.set_xlabel("수집된 공고 수 (N)", fontsize=12)
-    ax.set_ylabel("직무 (Job Roles)", fontsize=12)
+    ax.set_ylabel("직무", fontsize=12)
     
     # 축 서식 설정 (콤마)
     ax.xaxis.set_major_formatter(mticker.StrMethodFormatter('{x:,.0f}'))
@@ -120,7 +129,7 @@ def plot_job_counts(df, filename='graph_job_role_counts.png'):
     
     plt.tight_layout()
     plt.savefig(filename)
-    print(f"'{filename}' (Matplotlib) 그래프 저장 완료.")
+    print(f"'{filename}' 그래프 저장 완료.")
 
 # 3. 직무별 기술 스택 분석
 def analyze_skill_frequency(df, top_n=20):
@@ -137,6 +146,29 @@ def analyze_skill_frequency(df, top_n=20):
         # 막대그래프를 위해 역순 정렬 (맨 위가 1위가 되도록)
         all_skill_data[role] = top_skills_df.sort_values(by='Percentage', ascending=True)
     return all_skill_data
+
+# --- 직무별 기술 카테고리 비율 분석 ---
+def analyze_skill_category(df):
+    job_roles = df['job_role'].unique()
+    category_data = {role: Counter() for role in job_roles}
+    
+    # 기술 스택을 카테고리로 변환하여 집계
+    for _, row in df.iterrows():
+        role = row['job_role']
+        for skill in row['skills']:
+            found_category = 'Other'
+            for cat, skills in SKILL_CATEGORY_MAP.items():
+                if skill in skills:
+                    found_category = cat
+                    break
+            category_data[role][found_category] += 1
+            
+    # DataFrame으로 변환 (비율 계산)
+    category_df = pd.DataFrame(category_data).T.fillna(0)
+    # 100% 비율로 변환
+    category_ratio_df = category_df.div(category_df.sum(axis=1), axis=0) * 100
+    
+    return category_ratio_df
 
 # 4. 시각화 2: 직무별 요구 기술 topN (막대 그래프)
 def plot_top_skills(skill_data, filename_prefix='graph_top_skills'):
@@ -170,13 +202,17 @@ def plot_top_skills(skill_data, filename_prefix='graph_top_skills'):
         # 가독성을 위한 그리드 추가
         ax.grid(color='gray', linewidth=0.2, axis='x', linestyle='--')
         ax.set_axisbelow(True)
+
+        # 라벨 추가
+        for container in ax.containers:
+            ax.bar_label(container, fmt='%.1f%%', padding=3, fontsize=10)
         
         # 레이아웃 최적화
         plt.tight_layout()
         
         filename = f"{filename_prefix}_{role.replace(' ', '_')}.png"
         plt.savefig(filename)
-        print(f"'{filename}' (Matplotlib) 그래프 저장 완료.")
+        print(f"'{filename}' 그래프 저장 완료.")
  
 
 # 5. 시각화 3: 직무 간 기술 스택 비교 히트맵
@@ -218,13 +254,43 @@ def plot_heatmap_comparison(df, skill_data, top_n=15, filename='graph_skill_heat
         linewidths=.5   
     )
     plt.title("직무별 주요 기술 스택 요구 비율(%) 비교", fontsize=18)
-    plt.xlabel("기술 스택 (Skills)", fontsize=14)
-    plt.ylabel("직무 (Job Roles)", fontsize=14)
+    plt.xlabel("기술 스택", fontsize=14)
+    plt.ylabel("직무", fontsize=14)
     plt.xticks(rotation=45, ha='right')
     plt.tight_layout()
     
     plt.savefig(filename)
     print(f"'{filename}' 히트맵 저장 완료.")
+
+# 6. 시각화 4: 기술 카테고리별 비중 (누적 막대)
+def plot_skill_category_stacked(category_ratio_df, filename='skill_category_stacked.png'):
+    print("기술 카테고리 비중 시각화 중...")
+    
+    fig, ax = plt.subplots(figsize=(10, 6))
+    
+    # 누적 막대 그래프 그리기
+    category_ratio_df.plot(kind='barh', stacked=True, ax=ax, colormap='Set2', width=0.7)
+    
+    ax.set_title("직무별 요구 기술의 유형별 비중 비교", fontsize=16)
+    ax.set_xlabel("비중 (%)", fontsize=12)
+    ax.set_ylabel("직무", fontsize=12)
+    ax.set_xlim(0, 100)
+    
+    # 범례 위치 조정
+    ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol=6)
+    
+    # 값 표시 (비율)
+    for c in ax.containers:
+        labels = [f'{v.get_width():.1f}%' if v.get_width() > 5 else '' for v in c]
+        ax.bar_label(c, labels=labels, label_type='center', fontsize=10)
+
+    # 가독성을 위한 그리드 추가
+    ax.grid(color='gray', linewidth=0.2, axis='x', linestyle='--')
+    ax.set_axisbelow(True)
+
+    plt.tight_layout()
+    plt.savefig(filename)
+    print(f"'{filename}' 그래프 저장 완료.")
 
 # 6. 메인 실행 함수
 def main():
@@ -245,6 +311,10 @@ def main():
         
         # 비교 히트맵 생성
         plot_heatmap_comparison(df, skill_data)
+
+        # 카테고리 분석 및 시각화 실행
+        category_ratio_df = analyze_skill_category(df)
+        plot_skill_category_stacked(category_ratio_df)
 
         # 모든 플롯이 생성된 후, 마지막에 show() 호출
         print("\n모든 시각화가 파일로 저장되었습니다. 이제 화면에 표시합니다.")
