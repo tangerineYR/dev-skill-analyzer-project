@@ -107,6 +107,7 @@ def plot_job_counts(df, filename='graph_job_role_counts.png'):
     
     # 그리드 추가
     ax.grid(color='gray', linewidth=0.2, axis='x', linestyle='--')
+    ax.set_axisbelow(True)
     
     # 막대 위에 숫자 표시
     for bar in bars:
@@ -168,6 +169,7 @@ def plot_top_skills(skill_data, filename_prefix='graph_top_skills'):
         
         # 가독성을 위한 그리드 추가
         ax.grid(color='gray', linewidth=0.2, axis='x', linestyle='--')
+        ax.set_axisbelow(True)
         
         # 레이아웃 최적화
         plt.tight_layout()
