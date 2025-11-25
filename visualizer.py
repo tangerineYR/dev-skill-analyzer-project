@@ -263,7 +263,7 @@ def plot_heatmap_comparison(df, skill_data, top_n=15, filename='graph_skill_heat
     print(f"'{filename}' 히트맵 저장 완료.")
 
 # 6. 시각화 4: 기술 카테고리별 비중 (누적 막대)
-def plot_skill_category_stacked(category_ratio_df, filename='skill_category_stacked.png'):
+def plot_skill_category_stacked(category_ratio_df, filename='graph_skill_category_stacked.png'):
     print("기술 카테고리 비중 시각화 중...")
     
     fig, ax = plt.subplots(figsize=(10, 6))
@@ -322,3 +322,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
